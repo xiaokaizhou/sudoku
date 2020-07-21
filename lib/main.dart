@@ -1,19 +1,21 @@
-@JS('Sudoku')
-library core.js;
+//@JS('Sudoku')
+//library core.js;
 
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sudoku/sudoku.dart';
 import 'package:toast/toast.dart';
-import 'package:js/js.dart';
+//import 'package:js/js.dart';
 
-
-@JS()
-class Sudoku {
-  external Sudoku();
-  external List<int> getSource();
-  external List<int> getAnswer();
-}
-external Sudoku get sudoku;
+//@JS()
+//@anonymous
+//class Sudoku {
+//  external Sudoku();
+//  external List<int> getSource();
+//  external List<int> getAnswer();
+//}
+//external Sudoku get sudoku;
 
 void main() {
   runApp(MyApp());
@@ -67,22 +69,21 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Size screen;
   int selectNum;
+
   //120分钟
-  var maxProgress=120;
+  var maxProgress = 10;
   var progress = 1.0;
 
   Timer _countdownTimer;
 
-  // I gone format code
-  var data=[];
-  var answer=[];
+  List<int> data = List.generate(81, (index) => -1);
+  List<int> answer = [];
+
   @override
   void initState() {
-    var sudoku = Sudoku();
-    data =sudoku.getSource();
-    answer =sudoku.getAnswer();
     super.initState();
   }
+
   @override
   void didChangeDependencies() {
     screen = MediaQuery.of(context).size;
@@ -123,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
               shrinkWrap: true,
               itemCount: data.length,
               gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 9),
+                  SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 9),
               itemBuilder: ((BuildContext context, int index) {
                 return buildCell(index, data[index], getNormalColor(index));
               })),
@@ -136,23 +137,23 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(10, (index) => index + 1)
                   .map((e) => InkWell(
-                onTap: () {
-                  setState(() {
-                    selectNum = e;
-                  });
-                },
-                child: Container(
-                  color: selectNum != null && selectNum == e
-                      ? Colors.lightBlue
-                      : (e % 2 == 0 ? Colors.white : Colors.grey[100]),
-                  width: screen.width / 10,
-                  alignment: Alignment.center,
-                  child: Text(
-                    "$e",
-                    style: TextStyle(fontSize: 22),
-                  ),
-                ),
-              ))
+                        onTap: () {
+                          setState(() {
+                            selectNum = e;
+                          });
+                        },
+                        child: Container(
+                          color: selectNum != null && selectNum == e
+                              ? Colors.lightBlue
+                              : (e % 2 == 0 ? Colors.white : Colors.grey[100]),
+                          width: screen.width / 10,
+                          alignment: Alignment.center,
+                          child: Text(
+                            "$e",
+                            style: TextStyle(fontSize: 22),
+                          ),
+                        ),
+                      ))
                   .toList(),
             ),
           )
@@ -195,15 +196,47 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       onTap: () {
         setState(() {
-          if (selectNum != null) {
-            if (selectNum == answer[index]) {
-              data[index] = selectNum;
-              selectNum = null;
+          if (data[index] == -1) {
+            if (selectNum != null) {
+              if (selectNum == answer[index]) {
+                data[index] = selectNum;
+                selectNum = null;
+              } else {
+                Toast.show("不对哦！再想想", context);
+              }
             } else {
-              Toast.show("不对哦！再想想", context);
+              Toast.show("请先选择下方的数字", context);
             }
-          } else {
-            Toast.show("请先选择下方的数字", context);
+            var hasComplete =
+                data.firstWhere((element) => element == -1, orElse: () => -2);
+            if (hasComplete == -2) {
+              var duration = maxProgress-progress;
+              progress = 0;
+              _countdownTimer.cancel();
+              _countdownTimer = null;
+              //挑战成功
+              showDialog(
+                  context: context,
+                  child: CupertinoAlertDialog(
+                    title: Text('恭喜，挑战成功！'),
+                    content: Text('用时:$duration秒'),
+                    actions: <Widget>[
+                      CupertinoDialogAction(
+                        child: Text('取消'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      CupertinoDialogAction(
+                        child: Text('继续挑战'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          reGetCountdown();
+                        },
+                      ),
+                    ],
+                  ));
+            }
           }
         });
       },
@@ -215,6 +248,94 @@ class _MyHomePageState extends State<MyHomePage> {
       if (_countdownTimer != null) {
         return;
       }
+      List<int> data = <int>[
+        -1,
+        6,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        5,
+        -1,
+        9,
+        8,
+        -1,
+        7,
+        1,
+        -1,
+        -1,
+        -1,
+        8,
+        6,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        2,
+        -1,
+        -1,
+        -1,
+        -1,
+        3,
+        1,
+        7,
+        -1,
+        -1,
+        -1,
+        -1,
+        9,
+        4,
+        -1,
+        -1,
+        3,
+        -1,
+        -1,
+        4,
+        -1,
+        3,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        8,
+        -1,
+        1,
+        9,
+        4,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        3,
+        5,
+      ];
+      setState(() {
+        var sudoku = Sudoku(data);
+        this.data = sudoku.getSource();
+        answer = sudoku.getAnswer();
+      });
       // Timer的第一秒倒计时是有一点延迟的，为了立刻显示效果可以添加下一行。
       progress = 1;
       _countdownTimer = new Timer.periodic(new Duration(seconds: 1), (timer) {
@@ -225,6 +346,26 @@ class _MyHomePageState extends State<MyHomePage> {
             progress = 0;
             _countdownTimer.cancel();
             _countdownTimer = null;
+            showDialog(
+                context: context,
+                child: CupertinoAlertDialog(
+                  title: Text('挑战失败！'),
+                  actions: <Widget>[
+                    CupertinoDialogAction(
+                      child: Text('取消'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    CupertinoDialogAction(
+                      child: Text('重新开始'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        reGetCountdown();
+                      },
+                    ),
+                  ],
+                ));
           }
         });
       });
